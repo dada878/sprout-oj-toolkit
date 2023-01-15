@@ -1,7 +1,7 @@
-<h1 align="center">✨全華助手✨</h1>
+# ✨全華助手✨
 
 ## Introduction
-一個為全華線上測驗而生的輔助工具
+一個為全華線上測驗而生的輔助工具\
 ![preview image](assets/extension/preview-image.png)
 
 ## Get started
