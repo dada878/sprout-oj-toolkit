@@ -16,15 +16,17 @@
   },
   "permissions": [],
   "host_permissions": [
-    "http://52.68.126.252/*"
+    "http://52.68.126.252/*",
+    "http://exam.chwa.com.tw/*"
   ],
   "content_scripts": [
     {
       "matches": [
-        "http://52.68.126.252/*"
+        "http://52.68.126.252/*",
+        "http://exam.chwa.com.tw/*"
       ],
       "js": [
-        "scripts/main.js"
+        "./scripts/main.js"
       ],
       "run_at": "document_idle"
     }
