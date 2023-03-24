@@ -5,7 +5,7 @@
 ![preview image](assets/extension/preview-image.png)
 
 ## Get started
-[在 Edge 擴充套件商店下載]()
+[在 Edge 擴充套件商店下載](https://microsoftedge.microsoft.com/addons/detail/%E5%85%A8%E8%8F%AF%E5%8A%A9%E6%89%8B/caddmfhjodlapcapohemggjjaboahpdp?hl=en-US)
 
 ## Features
 - 自動記錄答案並填入正確答案

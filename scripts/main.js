@@ -1,46 +1,39 @@
 console.log("plugin loaded");
 
-function injectCustomCSS(type) {
-    console.log("tyr to inject custom css");
-    const styleEle = document.createElement('style');
-    styleEle.innerHTML = `.btn[style="margin-top:1em;"] { padding:0px !important}`;
-    document.body.appendChild(styleEle);
-    document.querySelector(`div[ng-${type}"showTotalScore"]`).style.maxWidth = "200px";
+function injectAds() {
+    const navbar = document.getElementsByClassName("hidden-xs ng-scope")[0];
+    const ele = document.createElement("div");
+    ele.innerHTML = `<div class="col-xs-3 col-md-3" src="images/ChwaLogo3.png" style=""><h3 style="font-weight: bolder;color: #003B89;filter: drop-shadow(0px 0px 3px lightblue);cursor: pointer;" onclick="window.open('https://microsoftedge.microsoft.com/addons/detail/%E5%85%A8%E8%8F%AF%E5%8A%A9%E6%89%8B/caddmfhjodlapcapohemggjjaboahpdp','_blank')">全華助手 v1.0.2</h3></div>`;
+    navbar.appendChild(ele.firstChild);
 }
 
 function addLoadAnswerBtn(type) {
+    const loadAnswerBtn = document.getElementById("chwa-helper-answer-btn");
+    if (loadAnswerBtn) return;
     console.log("tyr to add answer button");
     const btnElement = document.createElement('div');
-    btnElement.setAttribute("class", "btn");
-    btnElement.setAttribute("style", "margin-top:1em;");
-    btnElement.innerHTML = `<button class="btn btn-primary" id="chwa-helper-answer-btn" onclick="const evt = document.createEvent('Event');evt.initEvent('loadAnswer', true, false);document.dispatchEvent(evt);" style="display:block;">填入答案</button>`;
-    document.querySelector(`div[ng-${type}=showTotalScore]`).appendChild(btnElement);
+    btnElement.innerHTML = `<button id="chwa-helper-answer-btn" class="btn" ng-hide="showQ==Qcount" ng-click="nextQ()" onclick="const evt = document.createEvent('Event');evt.initEvent('loadAnswer', true, false);document.dispatchEvent(evt);" style="background-color: rgb(139 28 255); color: rgb(255, 255, 255); padding: 6px 12px; font-weight: bolder;">填入答案</button>`;
+    document.querySelector(`div[ng-${type}=showTotalScore]`).appendChild(btnElement.firstChild);
 }
 
 function addGuessBtn(type) {
+    const loadAnswerBtn = document.getElementById("chwa-helper-guess-btn");
+    if (loadAnswerBtn) return;
     console.log("tyr to add guess button");
     const btnElement = document.createElement('div');
-    btnElement.setAttribute("class", "btn");
-    btnElement.setAttribute("style", "margin-top:1em;");
-    btnElement.innerHTML = `<button class="btn btn-danger" id="chwa-helper-guess-btn" onclick="const evt = document.createEvent('Event');evt.initEvent('guessAnswer', true, false);document.dispatchEvent(evt);" style="display:block;margin-left: 4px;">猜題</button>`;
-    document.querySelector(`div[ng-${type}=showTotalScore]`).appendChild(btnElement);
+    btnElement.innerHTML = `<button id="chwa-helper-guess-btn" class="btn" ng-hide="showQ==Qcount" ng-click="nextQ()" onclick="const evt = document.createEvent('Event');evt.initEvent('guessAnswer', true, false);document.dispatchEvent(evt);" style="background-color: rgb(221 0 0);margin-left: 3px; color: rgb(255, 255, 255); padding: 6px 12px; font-weight: bolder;">猜題</button>`;
+    document.querySelector(`div[ng-${type}=showTotalScore]`).appendChild(btnElement.firstChild);
 }
 
 function isAnswerEmpty() {
     return JSON.stringify(answer) == "{}";
 }
 
-function initPage(type="hide") {
-    console.log("try to init this page")
-    if (document.querySelector(`div[ng-${type}=showTotalScore]`)) {
-        addLoadAnswerBtn("show");
-        addLoadAnswerBtn("hide");
-        injectCustomCSS("show");
-        injectCustomCSS("hide");
-        addGuessBtn("show");
-        addGuessBtn("hide");
-    }
-    if (type == hide) initPage("show");
+function initPage() {
+    if (!document.querySelector(`div[ng-hide=showTotalScore]`)) return;
+    injectAds();
+    addLoadAnswerBtn("hide");
+    addGuessBtn("hide");
 }
 
 initPage();
@@ -59,7 +52,7 @@ function saveAnswer() {
                 answer[description].push(opts.innerHTML);
             }
         }
-        alert(`紀錄成功 共 ${Object.keys(answer).length} 題！`);
+        alert(`答案紀錄成功 共 ${Object.keys(answer).length} 題！`);
     })();
 }
 
@@ -161,7 +154,7 @@ document.addEventListener('guessAnswer', () => {
 
 setInterval(() => {
     if (document.querySelector(`div[ng-hide="showTotalScore"].ng-hide`)) { // 結算頁面
-        console.log("state = finish page");
+        // console.log("state = finish page");
         let loadAnswerBtn = document.getElementById("chwa-helper-answer-btn");
         if (!loadAnswerBtn) {
             initPage();
@@ -170,7 +163,7 @@ setInterval(() => {
             saveAnswer();
         }
     } else if (document.querySelector(`div[ng-show="showTotalScore"].ng-hide`)) { // 答題頁面
-        console.log("state = quizing page");
+        // console.log("state = quizing page");
         let loadAnswerBtn = document.getElementById("chwa-helper-answer-btn");
         if (!loadAnswerBtn) {
             initPage();
@@ -182,6 +175,6 @@ setInterval(() => {
             loadAnswerBtn.style.cursor = "pointer";
         }
     } else {
-        console.log("state = other page");
+        // console.log("state = other page");
     }
 }, 100);
