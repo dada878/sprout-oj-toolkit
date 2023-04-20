@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "Sprout OJ Tools",
+  "name": "Sprout OJ Toolkit",
   "description": "Tools for sprout online judge",
   "homepage_url": "https://github.com/dada878",
   "version": "0.0.2",
