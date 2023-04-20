@@ -1,29 +1,27 @@
 {
   "manifest_version": 3,
-  "name": "全華助手",
-  "description": "全華線上測驗輔助工具",
+  "name": "Sprout OJ Tools",
+  "description": "Tools for sprout online judge",
   "homepage_url": "https://github.com/dada878",
   "version": "0.0.2",
   "author": "Dada878",
   "action": {
-    "default_icon": "assets/thumbnail.png",
+    "default_icon": "assets/favicon.png",
     "default_popup": "popup.html"
   },
   "icons": {
-    "16": "assets/thumbnail.png",
-    "48": "assets/thumbnail.png",
-    "128": "assets/thumbnail.png"
+    "16": "assets/favicon.png",
+    "48": "assets/favicon.png",
+    "128": "assets/favicon.png"
   },
   "permissions": [],
   "host_permissions": [
-    "http://52.68.126.252/*",
-    "http://exam.chwa.com.tw/*"
+    "https://neoj.sprout.tw/*"
   ],
   "content_scripts": [
     {
       "matches": [
-        "http://52.68.126.252/*",
-        "http://exam.chwa.com.tw/*"
+        "https://neoj.sprout.tw/*"
       ],
       "js": [
         "./scripts/main.js"

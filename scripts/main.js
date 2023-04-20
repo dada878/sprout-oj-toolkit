@@ -1,216 +1,129 @@
-class AnswerDB {
-    static getQuizID() {
-        return location.href.split("/").at(-1);
-    }
-    static save(data) {
-        const id = this.getQuizID();
-        localStorage.setItem(id, JSON.stringify(data));
-    }
-    static empty() {
-        const id = this.getQuizID();
-        return (localStorage.getItem(id) === null);
-    }
-    static load() {
-        const id = this.getQuizID();
-        return JSON.parse(localStorage.getItem(id));
-    }
+function waitForElm(selector) {
+    return new Promise(resolve => {
+        if (document.querySelector(selector)) {
+            return resolve(document.querySelector(selector));
+        }
+
+        const observer = new MutationObserver(mutations => {
+            if (document.querySelector(selector)) {
+                resolve(document.querySelector(selector));
+                observer.disconnect();
+            }
+        });
+
+        observer.observe(document.body, {
+            childList: true,
+            subtree: true
+        });
+    });
 }
 
-class QueryHelper {
-    static queryProblems() {
-        return document.querySelectorAll('div[ng-repeat="q in qt.qlist"]:not([style="float: left;"]):is(.ng-scope)');
-    }
-    static queryDescriptionOfProblem(problem) {
-        return problem.querySelector('p[ng-bind-html="q.q | trustedHtml"]');
-    }
-    static queryOptionsOfProblem(problem) {
-        return problem.querySelectorAll('span[ng-click="qt124Sel(option.value)"]');
-    }
-    static queryRightOptionsOfProblem(problem) {
-        return problem.querySelectorAll('.rightOption');
-    }
-    static queryProblemSwitchButtons() {
-        return document.querySelectorAll('.btn:is(.ng-binding):not(.ng-hide):not([id*="sendAns"])');
-    }
-    static queryNavbar() {
-        return document.getElementsByClassName("hidden-xs ng-scope")[0];
-    }
-    static queryLoadAnswerButton() {
-        return document.getElementById("chwa-helper-answer-btn");
-    }
-    static queryActionButtonGroup() {
-        return document.querySelector(`div[ng-hide=showTotalScore]`);
-    }
+let userID;
+waitForElm('#navbar .container .grid .grid').then((elm) => {
+    userID = document.querySelector("#navbar .container .grid .grid").children[4].children[0].getAttribute("href").split("/")[2];
+});
+
+const customCSS = document.createElement("style");
+customCSS.innerHTML = `
+tr.grid[style]:nth-child(2) {
+    border-top: 1px solid #d3d3d3;
+}
+tr.grid[style]:hover {
+    background-color: #e7e7e7 !important;
+    cursor: pointer;
+}
+tr.grid[style]:hover a {
+    text-decoration: underline;
+}
+tr.grid[style]:nth-child(odd) {
+    background-color: #f7f7f7;
 }
 
-class PadeRender {
-    static createElementFromHTML(htmlString) {
-        const ele = document.createElement("div");
-        ele.innerHTML = htmlString;
-        return ele.firstChild;
-    }
-    static isFinishOrQuizPage() {
-        return !!QueryHelper.queryActionButtonGroup();
-    }
-    static render() {
-        if (!this.isRendered()) {
-            if (!this.isFinishOrQuizPage()) return;
-            this.injectAds();
-            this.addLoadAnswerBtn();
-            this.addGuessBtn();
-        }
-        QueryHelper.queryLoadAnswerButton().style.cursor = AnswerDB.empty() ? "not-allowed" : "pointer";
-    }
-    static isRendered() {
-        return !!QueryHelper.queryLoadAnswerButton();
-    }
-    static injectAds() {
-        QueryHelper.queryNavbar().appendChild(
-            this.createElementFromHTML(`<div class="col-xs-3 col-md-3" src="images/ChwaLogo3.png" style=""><h3 style="font-weight: bolder;color: #003B89;filter: drop-shadow(0px 0px 3px lightblue);cursor: pointer;" onclick="window.open('https://microsoftedge.microsoft.com/addons/detail/%E5%85%A8%E8%8F%AF%E5%8A%A9%E6%89%8B/caddmfhjodlapcapohemggjjaboahpdp','_blank')">全華助手 v1.0.2</h3></div>`)
-        );
-    }
-    static addLoadAnswerBtn() {
-        QueryHelper.queryActionButtonGroup().appendChild(
-            this.createElementFromHTML(`<button id="chwa-helper-answer-btn" class="btn" ng-hide="showQ==Qcount" ng-click="nextQ()" onclick="const evt = document.createEvent('Event');evt.initEvent('loadAnswer', true, false);document.dispatchEvent(evt);" style="background-color: rgb(139 28 255); color: rgb(255, 255, 255); padding: 6px 12px; font-weight: bolder;">填入答案</button>`)
-        );
-    }
-    static addGuessBtn() {
-        QueryHelper.queryActionButtonGroup().appendChild(
-            this.createElementFromHTML(`<button id="chwa-helper-guess-btn" class="btn" ng-hide="showQ==Qcount" ng-click="nextQ()" onclick="const evt = document.createEvent('Event');evt.initEvent('guessAnswer', true, false);document.dispatchEvent(evt);" style="background-color: rgb(221 0 0);margin-left: 3px; color: rgb(255, 255, 255); padding: 6px 12px; font-weight: bolder;">猜題</button>`)
-        );
-    }
+tr.grid[style].bonus .col::before {
+    content: "[Bonus] ";
 }
 
-class QuizManager {
-    static saveAnswer() {
-        const answer = {};
-        const problems = QueryHelper.queryProblems();
-        for (const problem of problems) {
-            const description = QueryHelper.queryDescriptionOfProblem(problem).innerHTML;
-            const answerOptionElements = QueryHelper.queryRightOptionsOfProblem(problem);
-            answer[description] = [];
-            for (let opts of answerOptionElements) {
-                answer[description].push(opts.innerHTML);
-            }
-        }
-        alert(`答案紀錄成功 共 ${Object.keys(answer).length} 題！`);
-        AnswerDB.save(answer);
-    }
-    static loadAnswer() {
-        if (AnswerDB.empty()) return alert("暫無儲存的答案，請先至少交卷一次後再使用");
-        const answer = AnswerDB.load();
-        const problems = QueryHelper.queryProblems();
-        const btns = QueryHelper.queryProblemSwitchButtons();
-        let wrongCount = 0;
-        const problemsWriten = [];
-        const failedWriten = [];
-        const leftAnswerTable = {};
-        const editDistance = function (word1, word2) {
-            let dp = Array(word1.length + 1).fill(null).map(() => (Array(word2.length + 1).fill(0)));
-            for (let i = 0; i < dp.length; i++) dp[i][0] = i
-            for (let i = 0; i < dp[0].length; i++) dp[0][i] = i
-            for (let i = 1; i < dp.length; i++) {
-                for (let j = 1; j < dp[0].length; j++) {
-                    dp[i][j] = Math.min(dp[i - 1][j] + 1, dp[i][j - 1] + 1, dp[i - 1][j - 1] + (word1[i - 1] != word2[j - 1] ? 1 : 0));
-                }
-            }
-            return dp[dp.length - 1][dp[0].length - 1];
-        }
-        const writeAnswer = function (problem, defaultDescription = null) {
-            const description = defaultDescription ?? QueryHelper.queryDescriptionOfProblem(problem).innerHTML;
-            const options = QueryHelper.queryOptionsOfProblem(problem);
-            let flag = false;
-            for (let opt of options) {
-                try {
-                    for (let ansOpt of answer[description]) {
-                        if (ansOpt == opt.innerHTML) {
-                            opt.click();
-                            flag = true;
-                        }
-                    }
-                } catch (e) { }
-            }
-            if (!flag) {
-                wrongCount++;
-                let minDistance = Number.MAX_SAFE_INTEGER;
-                let minDistanceElement = null;
-                for (let opt of options) {
-                    try {
-                        for (let ansOpt of answer[description]) {
-                            let distance = editDistance(ansOpt, opt.innerHTML);
-                            if (distance < minDistance) {
-                                minDistance = distance;
-                                minDistanceElement = opt;
-                            }
-                        }
-                    } catch (e) {
-                        wrongCount++;
-                    }
-                }
-                if (minDistanceElement) {
-                    flag = true;
-                    minDistanceElement.click();
-                }
-            }
-            if (!flag) failedWriten.push(problem);
-            else problemsWriten.push(description);
-        }
-        for (let problem of problems) writeAnswer(problem);
-        for (const key of Object.keys(answer)) {
-            if (!problemsWriten.includes(key)) leftAnswerTable[key] = answer[key];
-        }
-        for (const problem of failedWriten) {
-            const description = QueryHelper.queryDescriptionOfProblem(problem).innerHTML;
-            let minDistance = Number.MAX_SAFE_INTEGER;
-            let minDistanceDescription = null;
-            for (const answerDescription of Object.keys(leftAnswerTable)) {
-                let distance = editDistance(answerDescription, description);
-                if (distance < minDistance) {
-                    minDistance = distance;
-                    minDistanceDescription = answerDescription;
-                }
-            }
-            writeAnswer(problem, minDistanceDescription);
-        }
-        if (wrongCount) alert(`填入完畢 共有 ${wrongCount} 題作答可能錯誤！`);
-        else alert(`答案填入完畢！`);
-        for (const btn of btns) btn.click();
-    }
-    static guessAnswer() {
-        const problems = QueryHelper.queryProblems();
-        for (let problem of problems) {
-            const options = QueryHelper.queryOptionsOfProblem(problem);
-            options[Math.floor(Math.random() * (3 - 0 + 1)) + 0].click();
-        }
-        for (const btn of QueryHelper.queryProblemSwitchButtons()) btn.click();
-        alert(`猜完所有題目了！`);
-    }
+progress {
+    border-radius: 7px; 
+    width: 70%;
+    height: 18px;
+  }
+  progress::-webkit-progress-bar {
+    background-color: #f7f7f7;
+    border: 1px solid #d3d3d3;
+    border-radius: 7px;
+  }
+  progress::-webkit-progress-value {
+    background-color: gray;
+    border: 1px solid #d3d3d3;
+    border-radius: 7px;
 }
-
-class PageStatusManager {
-    static isFinishPage() {
-        return !!document.querySelector(`div[ng-hide="showTotalScore"].ng-hide`);
-    }
-    static isQuizPage() {
-        return !!document.querySelector(`div[ng-show="showTotalScore"].ng-hide`);
-    }
+`;
+document.head.appendChild(customCSS);
+function createProgressBar() {
+    const ele = document.createElement("div");
+    ele.style.marginTop = "2rem";
+    ele.id = "state-board";
+    ele.innerHTML = `
+    <p style="margin-bottom:0.3rem">Solving progress:</p>
+    <progress max="100" value="0" id="progress-bar"></progress>
+    <p style="margin-bottom:0.3rem">Without bonus:</p>
+    <progress max="100" value="0" id="progress-bar-without-bouns"></progress>
+    `
+    document.querySelector("#group-board .col-2").appendChild(ele);
 }
-
-class ChwaHelper {
-    static init() {
-        console.log("[Chwa-Helper] Plugin loaded");
-        document.addEventListener('loadAnswer', () => QuizManager.loadAnswer());
-        document.addEventListener('guessAnswer', () => QuizManager.guessAnswer());
-        PadeRender.render();
-        setInterval(() => {
-            if (PageStatusManager.isFinishPage()) {
-                PadeRender.render();
-                if (AnswerDB.empty()) QuizManager.saveAnswer();
-            } else if (PageStatusManager.isQuizPage()) {
-                PadeRender.render();
-            }
-        }, 100);
-    }
+function createSubmissionsButton() {
+    const ele = document.createElement("div");
+    ele.classList.add("grid");
+    ele.innerHTML = `<div class="col"><button id="my-submitison-btn">My submitison</button></div>`;
+    ele.onclick = () => window.location.href = `https://neoj.sprout.tw/status?filter={"user_uid":${userID},"problem_uid":${location.href.split("/")[4]},"result":null}`;
+    document.querySelector("#problem .col-2").children[4].insertAdjacentElement('afterend', ele);
 }
-
-ChwaHelper.init();
+setInterval(() => {
+    if (location.href == "https://neoj.sprout.tw/group/") document.querySelector("#group-board .col-2 li a").click();
+    if (document.querySelector("#group") == null) return;
+    if (!document.getElementById("state-board")) createProgressBar();
+    const problems = document.getElementById("group").children[0].children;
+    const colorSet = {
+        "Accepted" : "#7cf07c",
+        "Wrong Answer": "#f07c7c",
+        "Time Limit Exceeded": "#f07c7c",
+        "Compile Error": "#f07c7c",
+        "Runtime Error": "#f07c7c"
+    }
+    const allProblem = problems.length - 1;
+    let solvedProblem = 0;
+    let bonusProblem = 0;
+    let solvedBounsProblem = 0;
+    for (let i = 0; i < problems.length; i++) {
+        const problem = problems[i];
+        if (problem.tagName == "THEAD") continue;
+        const [id, name, state, deadline] = [
+            problem.children[0],
+            problem.children[1].children[0],
+            problem.children[2],
+            problem.children[3]
+        ];
+        problem.onclick = () => window.location.href = "https://neoj.sprout.tw/problem/" + id.innerHTML;
+        problem.style.borderBottom = "#d3d3d3 1px solid";
+        problem.querySelector("a").removeAttribute("href");
+        problem.querySelector("a").style.pointerEvents = "none";
+        state.style.backgroundColor = colorSet[state.innerHTML];
+        solvedProblem += state.innerHTML == "Accepted" ? 1 : 0;
+        if (
+            window.location.href.includes("group/53") &&
+            deadline.innerHTML != "None" &&
+            deadline.innerHTML.split(" ")[1].split(":")[0] == "23"
+        ) {
+            problem.classList.add("bonus");
+            bonusProblem++;
+            solvedBounsProblem += state.innerHTML == "Accepted" ? 1 : 0;
+        }
+    }
+    document.getElementById("progress-bar").value = solvedProblem / allProblem * 100;
+    document.getElementById("progress-bar-without-bouns").value = (solvedProblem - solvedBounsProblem) / (allProblem - bonusProblem) * 100;
+}, 100);
+setInterval(() => {
+    if (document.querySelector("#problem") == null) return;
+    if (!document.getElementById("my-submitison-btn")) createSubmissionsButton();
+}, 100);

@@ -1,8 +1,8 @@
 {
-  "name": "chwa-helper",
+  "name": "sprout-oj-tools",
   "version": "0.0.1",
   "private": true,
-  "description": "全華線上測驗輔助工具",
+  "description": "Tools for Sprout Online Judge",
   "scripts": {
     "setup": "npm i",
     "format": "prettier --write **/*.{js,jsx,ts,tsx,css,html}",

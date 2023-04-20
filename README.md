@@ -1,18 +1,18 @@
-# ✨全華助手✨
+# ✨Sprout Online Judge Toolkit✨
 
 ## Introduction
-一個為全華線上測驗而生的輔助工具\
-![preview image](assets/extension/preview-image.png)
+為 Sprout Online Judge 新增一些小功能
 
 ## Get started
-[在 Edge 擴充套件商店下載](https://microsoftedge.microsoft.com/addons/detail/%E5%85%A8%E8%8F%AF%E5%8A%A9%E6%89%8B/caddmfhjodlapcapohemggjjaboahpdp?hl=en-US)
+[在 Edge 擴充套件商店下載]()
 
 ## Features
-- 自動記錄答案並填入正確答案
-- 自動猜題
-- 少部分網站介面優化
+- 更好的題目狀態顯示
 
-## Future
-- 針對敘述相同的題目做額外判斷
-- 自動填入資料快速登入
-- 雲端共享題目解答
+    ![](/assets/extension/2023-04-20-13-00-05.png)
+- Collection 題單解題進度顯示
+
+    ![](/assets/extension/2023-04-20-13-00-39.png)
+- 在問題頁面添加 My submitison 按鈕
+
+    ![](/assets/extension/2023-04-20-13-02-35.png)
