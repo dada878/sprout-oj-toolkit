@@ -5,6 +5,8 @@
 
 ## Get started
 [在 Edge 擴充套件商店下載]()
+[在 Chrome 擴充套件商店下載]()
+
 
 ## Features
 - 更好的題目狀態顯示
