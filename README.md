@@ -15,6 +15,6 @@
 - Collection 題單解題進度顯示
 
     ![](/assets/extension/2023-04-20-13-00-39.png)
-- 在問題頁面添加 My submitison 按鈕
+- 在問題頁面添加 My Submissions 按鈕
 
     ![](/assets/extension/2023-04-20-13-02-35.png)
