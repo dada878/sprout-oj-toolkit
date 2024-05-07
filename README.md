@@ -1,11 +1,12 @@
 # ✨Sprout Online Judge Toolkit✨
 
 ## Introduction
-為 Sprout Online Judge 新增一些小功能
+為 Sprout Online Judge 新增一些小功能 (NEOJ)
 
 ## Get started
-[在 Edge 擴充套件商店下載]()
-[在 Chrome 擴充套件商店下載]()
+[在 Edge 擴充套件商店下載](https://microsoftedge.microsoft.com/addons/detail/sprout-oj-toolkit/nahnoidmmncfcgnjbahjmclecmgfkkga)
+
+[在 Chrome 擴充套件商店下載](https://chromewebstore.google.com/detail/sprout-oj-toolkit/mngkdlgnpkmofanhnanbbmpdopgpamhd?hl=en&authuser=0)
 
 
 ## Features
