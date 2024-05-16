@@ -75,8 +75,7 @@ function createProgressBar() {
 function createSubmissionsButton() {
     const ele = document.createElement("div");
     ele.classList.add("grid");
-    ele.innerHTML = `<div class="col"><button id="my-submissions-btn">My Submissions</button></div>`;
-    ele.onclick = () => window.location.href = `https://neoj.sprout.tw/status?filter={"user_uid":${userID},"problem_uid":${location.href.split("/")[4]},"result":null}`;
+    ele.innerHTML = `<div class="col"><a href="https://neoj.sprout.tw/status?filter={"user_uid":${userID},"problem_uid":${location.href.split("/")[4]},"result":null}" target="_blank" style="text-decoration: none;"><button id="my-submissions-btn">My Submissions</button></a></div>`;
     document.querySelector("#problem .col-2").children[4].insertAdjacentElement('afterend', ele);
 }
 setInterval(() => {
