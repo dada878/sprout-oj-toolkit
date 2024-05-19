@@ -75,8 +75,18 @@ function createProgressBar() {
 function createSubmissionsButton() {
     const ele = document.createElement("div");
     ele.classList.add("grid");
-    ele.innerHTML = `<div class="col"><a href="https://neoj.sprout.tw/status?filter={"user_uid":${userID},"problem_uid":${location.href.split("/")[4]},"result":null}" target="_blank" style="text-decoration: none;"><button id="my-submissions-btn">My Submissions</button></a></div>`;
+    const linkButton = document.createElement("a");
+    linkButton.href = `https://neoj.sprout.tw/status?filter={\"user_uid\":${userID},\"problem_uid\":${location.href.split("/")[4]},\"result\":null}`;
+    linkButton.target = "_blank";
+    linkButton.style.textDecoration = "none";
+    linkButton.innerHTML = `<button id="my-submissions-btn">My Submissions</button>`;
+    const col = document.createElement("div");
+    col.classList.add("col");
+    col.appendChild(linkButton);
+    ele.appendChild(col);
+    // ele.innerHTML = `<div class="col"><a href="" target="_blank" style="text-decoration: none;"><button id="my-submissions-btn">My Submissions</button></a></div>`;
     document.querySelector("#problem .col-2").children[4].insertAdjacentElement('afterend', ele);
+    // document.querySelector("#problem .col-2").appendChild(ele);
 }
 setInterval(() => {
     if (location.href == "https://neoj.sprout.tw/group/") document.querySelector("#group-board .col-2 li a").click();
